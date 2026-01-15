@@ -1,21 +1,362 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>Gym QR</title>
 <style>
-html,body { margin:0; padding:0; height:100%; background:black; }
-iframe { width:100%; height:100%; border:none; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #000;
+  color: #fff;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Setup Screen */
+#setup-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  height: 100vh;
+  background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
+}
+
+#setup-screen h1 {
+  font-size: 28px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+#setup-screen p {
+  color: #888;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.input-group {
+  width: 100%;
+  max-width: 320px;
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #aaa;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #333;
+  border-radius: 10px;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 16px;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #007aff;
+}
+
+.btn-primary {
+  width: 100%;
+  max-width: 320px;
+  padding: 14px;
+  background: #007aff;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.btn-primary:active {
+  background: #0051a8;
+}
+
+/* Main Screen */
+#main-screen {
+  display: none;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Credentials Bar */
+#creds-bar {
+  background: #1a1a1a;
+  padding: 12px;
+  border-bottom: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cred-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cred-label {
+  font-size: 12px;
+  color: #888;
+  width: 60px;
+}
+
+.cred-value {
+  flex: 1;
+  padding: 8px 10px;
+  background: #0a0a0a;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'Courier New', monospace;
+}
+
+.cred-value.hidden {
+  letter-spacing: 2px;
+}
+
+.btn-copy {
+  padding: 6px 12px;
+  background: #007aff;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-copy:active {
+  background: #0051a8;
+}
+
+.btn-copy.copied {
+  background: #34c759;
+}
+
+/* Top Actions */
+.top-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #0a0a0a;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  background: #2a2a2a;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn-small:active {
+  background: #3a3a3a;
+}
+
+/* Iframe Container */
+#iframe-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+#gym-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Hidden */
+.hidden {
+  display: none !important;
+}
+
+/* Toast */
+#toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #34c759;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+#toast.show {
+  opacity: 1;
+}
 </style>
 </head>
 <body>
 
-<iframe id="qr" src="https://socios.clubatleticosanmiguel.com/panel.php#"></iframe>
+<!-- Setup Screen -->
+<div id="setup-screen">
+  <h1>🏋️ Gym QR</h1>
+  <p>Guarda tus credenciales para acceso rápido</p>
+
+  <div class="input-group">
+    <label>Usuario</label>
+    <input type="number" id="setup-usuario" placeholder="Número de socio" inputmode="numeric">
+  </div>
+
+  <div class="input-group">
+    <label>Contraseña</label>
+    <input type="password" id="setup-clave" placeholder="Tu contraseña">
+  </div>
+
+  <button class="btn-primary" onclick="saveCredentials()">Guardar y continuar</button>
+</div>
+
+<!-- Main Screen -->
+<div id="main-screen">
+  <!-- Credentials Bar -->
+  <div id="creds-bar">
+    <div class="cred-row">
+      <span class="cred-label">Usuario:</span>
+      <div class="cred-value" id="display-usuario"></div>
+      <button class="btn-copy" onclick="copyText('usuario')">Copiar</button>
+    </div>
+    <div class="cred-row">
+      <span class="cred-label">Clave:</span>
+      <div class="cred-value hidden" id="display-clave">••••••••</div>
+      <button class="btn-copy" onclick="copyText('clave')">Copiar</button>
+    </div>
+  </div>
+
+  <!-- Top Actions -->
+  <div class="top-actions">
+    <button class="btn-small" onclick="togglePassword()">👁️ Mostrar</button>
+    <button class="btn-small" onclick="refreshIframe()">🔄 Actualizar</button>
+    <button class="btn-small" onclick="clearCredentials()">⚙️ Cambiar</button>
+  </div>
+
+  <!-- Iframe -->
+  <div id="iframe-container">
+    <iframe id="gym-iframe" src="https://socios.clubatleticosanmiguel.com/"></iframe>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
 
 <script>
-setInterval(() => {
-  document.getElementById("qr").src =
-   "https://socios.clubatleticosanmiguel.com/panel.php#?t=" + Date.now();
-}, 1800000); // 30 minutos
+let credentials = null;
+let passwordVisible = false;
+
+// Load credentials on start
+window.onload = function() {
+  const saved = localStorage.getItem('gym-credentials');
+  if (saved) {
+    credentials = JSON.parse(saved);
+    showMainScreen();
+  } else {
+    document.getElementById('setup-screen').style.display = 'flex';
+  }
+};
+
+function saveCredentials() {
+  const usuario = document.getElementById('setup-usuario').value.trim();
+  const clave = document.getElementById('setup-clave').value.trim();
+
+  if (!usuario || !clave) {
+    showToast('Por favor completa ambos campos');
+    return;
+  }
+
+  credentials = { usuario, clave };
+  localStorage.setItem('gym-credentials', JSON.stringify(credentials));
+
+  showMainScreen();
+}
+
+function showMainScreen() {
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('main-screen').style.display = 'flex';
+
+  document.getElementById('display-usuario').textContent = credentials.usuario;
+  document.getElementById('display-clave').setAttribute('data-value', credentials.clave);
+}
+
+function copyText(field) {
+  const text = credentials[field];
+
+  // Copy to clipboard
+  navigator.clipboard.writeText(text).then(() => {
+    // Show feedback
+    const btn = event.target;
+    const originalText = btn.textContent;
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('copied');
+
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.classList.remove('copied');
+    }, 2000);
+
+    showToast(`${field === 'usuario' ? 'Usuario' : 'Contraseña'} copiado`);
+  });
+}
+
+function togglePassword() {
+  passwordVisible = !passwordVisible;
+  const claveEl = document.getElementById('display-clave');
+  const btn = event.target;
+
+  if (passwordVisible) {
+    claveEl.textContent = credentials.clave;
+    claveEl.classList.remove('hidden');
+    btn.textContent = '🙈 Ocultar';
+  } else {
+    claveEl.textContent = '••••••••';
+    claveEl.classList.add('hidden');
+    btn.textContent = '👁️ Mostrar';
+  }
+}
+
+function refreshIframe() {
+  const iframe = document.getElementById('gym-iframe');
+  iframe.src = iframe.src;
+  showToast('Página actualizada');
+}
+
+function clearCredentials() {
+  if (confirm('¿Borrar credenciales guardadas?')) {
+    localStorage.removeItem('gym-credentials');
+    credentials = null;
+    passwordVisible = false;
+    location.reload();
+  }
+}
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 2000);
+}
 </script>
 
 </body>
