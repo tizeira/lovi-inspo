@@ -6,12 +6,13 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Gym QR">
-<title>Gym QR - Auto Login</title>
+<title>Gym QR - Club Atlético San Miguel</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
+  background: linear-gradient(135deg, #0f0f0f 0%, #000 100%);
   color: #fff;
   min-height: 100vh;
   display: flex;
@@ -21,22 +22,23 @@ body {
   padding: 20px;
 }
 
-/* Setup Screen */
+/* ========== Setup Screen (Primera vez) ========== */
 #setup-screen {
   width: 100%;
   max-width: 400px;
   text-align: center;
+  display: none;
 }
 
 #setup-screen h1 {
-  font-size: 32px;
-  margin-bottom: 10px;
+  font-size: 36px;
+  margin-bottom: 8px;
   font-weight: 700;
 }
 
-#setup-screen p {
+#setup-screen .subtitle {
   color: #888;
-  margin-bottom: 40px;
+  margin-bottom: 50px;
   font-size: 15px;
 }
 
@@ -61,133 +63,189 @@ body {
   background: #1a1a1a;
   color: #fff;
   font-size: 17px;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
 }
 
 .input-group input:focus {
   outline: none;
-  border-color: #007aff;
+  border-color: #34c759;
   background: #222;
 }
 
-.btn-primary {
-  width: 100%;
-  padding: 16px;
-  background: #007aff;
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  font-size: 17px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: background 0.2s;
-}
-
-.btn-primary:active {
-  background: #0051a8;
-}
-
-/* Auto-login Screen */
-#autologin-screen {
-  display: none;
+/* ========== Main Screen (Usuario ya registrado) ========== */
+#main-screen {
   width: 100%;
   max-width: 400px;
   text-align: center;
+  display: none;
 }
 
-.spinner {
-  width: 60px;
-  height: 60px;
-  border: 4px solid #333;
-  border-top: 4px solid #007aff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 30px;
+.app-header {
+  margin-bottom: 60px;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.app-header h1 {
+  font-size: 42px;
+  margin-bottom: 8px;
+  font-weight: 800;
 }
 
-#autologin-screen h2 {
-  font-size: 24px;
-  margin-bottom: 10px;
-  font-weight: 600;
-}
-
-#autologin-screen p {
+.app-header .tagline {
   color: #888;
-  font-size: 15px;
-  margin-bottom: 40px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
-.creds-display {
-  background: #1a1a1a;
-  border-radius: 12px;
-  padding: 20px;
+/* User Card */
+.user-card {
+  background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+  border: 1px solid #333;
+  border-radius: 16px;
+  padding: 24px;
   margin-bottom: 30px;
-  text-align: left;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
 }
 
-.cred-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #333;
-}
-
-.cred-item:last-child {
-  border-bottom: none;
-}
-
-.cred-label {
+.user-card .label {
   color: #888;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
 }
 
-.cred-value {
-  color: #fff;
-  font-size: 15px;
+.user-card .value {
+  color: #34c759;
+  font-size: 28px;
+  font-weight: 700;
   font-family: 'Courier New', monospace;
+  margin-bottom: 16px;
 }
 
+.user-card .status {
+  color: #666;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.user-card .status .dot {
+  width: 8px;
+  height: 8px;
+  background: #34c759;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Main Action Button */
+.btn-main {
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(135deg, #34c759 0%, #2fb350 100%);
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 24px rgba(52, 199, 89, 0.3);
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-main:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 12px rgba(52, 199, 89, 0.2);
+}
+
+/* Secondary Buttons */
 .btn-secondary {
   width: 100%;
   padding: 14px;
-  background: #2a2a2a;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
+  background: #1a1a1a;
+  color: #888;
+  border: 1px solid #333;
+  border-radius: 12px;
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
-  margin-top: 10px;
-  transition: background 0.2s;
+  margin-bottom: 12px;
+  transition: all 0.2s;
 }
 
 .btn-secondary:active {
-  background: #3a3a3a;
+  background: #222;
+  border-color: #444;
 }
 
-/* Hidden form for auto-submit */
+/* Info Box */
+.info-box {
+  background: rgba(0, 122, 255, 0.1);
+  border: 1px solid rgba(0, 122, 255, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 30px;
+  text-align: left;
+}
+
+.info-box .title {
+  color: #007aff;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.info-box .content {
+  color: #888;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.info-box ol {
+  margin-left: 18px;
+  margin-top: 8px;
+}
+
+.info-box li {
+  margin-bottom: 4px;
+}
+
+/* Hidden form for login */
 #login-form {
   display: none;
 }
 
-.hidden {
-  display: none !important;
-}
-
-/* Status messages */
+/* Status Messages */
 .status-message {
   margin-top: 20px;
-  padding: 12px;
-  border-radius: 8px;
+  padding: 14px;
+  border-radius: 10px;
   font-size: 14px;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .status-error {
@@ -196,59 +254,92 @@ body {
   color: #ff3b30;
 }
 
-.status-info {
-  background: rgba(0, 122, 255, 0.15);
-  border: 1px solid rgba(0, 122, 255, 0.3);
-  color: #007aff;
+.status-success {
+  background: rgba(52, 199, 89, 0.15);
+  border: 1px solid rgba(52, 199, 89, 0.3);
+  color: #34c759;
+}
+
+/* Footer */
+.footer {
+  margin-top: 40px;
+  color: #444;
+  font-size: 12px;
+  text-align: center;
 }
 </style>
 </head>
 <body>
 
-<!-- Setup Screen -->
+<!-- Setup Screen (Primera vez) -->
 <div id="setup-screen">
   <h1>🏋️ Gym QR</h1>
-  <p>Configura tu acceso automático al gimnasio</p>
+  <p class="subtitle">Acceso rápido al club</p>
 
   <div class="input-group">
     <label>Número de Socio</label>
-    <input type="number" id="setup-usuario" placeholder="12345678" inputmode="numeric" autocomplete="off">
+    <input type="number" id="setup-usuario" placeholder="Ej: 12345678" inputmode="numeric" autocomplete="off">
   </div>
 
   <div class="input-group">
     <label>Contraseña</label>
-    <input type="password" id="setup-clave" placeholder="Tu contraseña" autocomplete="off">
+    <input type="password" id="setup-clave" placeholder="Tu contraseña del club" autocomplete="off">
   </div>
 
-  <button class="btn-primary" onclick="saveAndLogin()">Guardar e Iniciar Sesión</button>
+  <button class="btn-main" onclick="saveCredentials()">Guardar Credenciales</button>
 
   <div id="setup-status"></div>
+
+  <div class="info-box">
+    <div class="title">🔒 Seguridad</div>
+    <div class="content">
+      Tus credenciales se guardan solo en este dispositivo. Nunca se envían a servidores externos.
+    </div>
+  </div>
 </div>
 
-<!-- Auto-login Screen -->
-<div id="autologin-screen">
-  <div class="spinner"></div>
-  <h2>Iniciando sesión...</h2>
-  <p>Conectando con el club</p>
+<!-- Main Screen (Usuario registrado) -->
+<div id="main-screen">
+  <div class="app-header">
+    <h1>🏋️</h1>
+    <p class="tagline">Club Atlético</p>
+  </div>
 
-  <div class="creds-display">
-    <div class="cred-item">
-      <span class="cred-label">Usuario</span>
-      <span class="cred-value" id="display-usuario"></span>
-    </div>
-    <div class="cred-item">
-      <span class="cred-label">Estado</span>
-      <span class="cred-value" id="login-status">Autenticando...</span>
+  <div class="user-card">
+    <div class="label">Socio Nº</div>
+    <div class="value" id="display-usuario"></div>
+    <div class="status">
+      <span class="dot"></span>
+      Credenciales guardadas
     </div>
   </div>
 
-  <button class="btn-secondary" onclick="cancelLogin()">Cancelar</button>
-  <button class="btn-secondary" onclick="clearCredentials()">Borrar credenciales</button>
+  <button class="btn-main" onclick="loginToClub()">
+    🚀 Entrar al Club
+  </button>
 
-  <div id="autologin-status"></div>
+  <button class="btn-secondary" onclick="showChangeCredentials()">
+    Cambiar Credenciales
+  </button>
+
+  <div class="info-box">
+    <div class="title">💡 Tip: Guardar QR como wallpaper</div>
+    <div class="content">
+      Después de entrar al club:
+      <ol>
+        <li>Toca y mantén presionado el QR</li>
+        <li>Selecciona "Guardar imagen"</li>
+        <li>Usa la imagen como fondo de pantalla/lockscreen</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="footer">
+    Club Atlético San Miguel
+  </div>
 </div>
 
-<!-- Hidden form that auto-submits -->
+<!-- Hidden login form -->
 <form id="login-form" action="https://socios.clubatleticosanmiguel.com/" method="POST" target="_self">
   <input type="number" name="usuario" id="form-usuario">
   <input type="password" name="clave" id="form-clave">
@@ -256,14 +347,13 @@ body {
 
 <script>
 let credentials = null;
-let loginTimeout = null;
 
 // Check for saved credentials on load
 window.onload = function() {
   const saved = localStorage.getItem('gym-credentials');
   if (saved) {
     credentials = JSON.parse(saved);
-    autoLogin();
+    showMainScreen();
   } else {
     showSetupScreen();
   }
@@ -271,16 +361,16 @@ window.onload = function() {
 
 function showSetupScreen() {
   document.getElementById('setup-screen').style.display = 'block';
-  document.getElementById('autologin-screen').style.display = 'none';
+  document.getElementById('main-screen').style.display = 'none';
 }
 
-function showAutoLoginScreen() {
+function showMainScreen() {
   document.getElementById('setup-screen').style.display = 'none';
-  document.getElementById('autologin-screen').style.display = 'block';
+  document.getElementById('main-screen').style.display = 'block';
   document.getElementById('display-usuario').textContent = credentials.usuario;
 }
 
-function saveAndLogin() {
+function saveCredentials() {
   const usuario = document.getElementById('setup-usuario').value.trim();
   const clave = document.getElementById('setup-clave').value.trim();
 
@@ -289,50 +379,50 @@ function saveAndLogin() {
     return;
   }
 
+  // Validate usuario is a number
+  if (isNaN(usuario)) {
+    showStatus('setup', 'El número de socio debe ser numérico', 'error');
+    return;
+  }
+
   credentials = { usuario, clave };
   localStorage.setItem('gym-credentials', JSON.stringify(credentials));
 
-  autoLogin();
-}
+  showStatus('setup', '✓ Credenciales guardadas correctamente', 'success');
 
-function autoLogin() {
-  showAutoLoginScreen();
-
-  // Fill form with credentials
-  document.getElementById('form-usuario').value = credentials.usuario;
-  document.getElementById('form-clave').value = credentials.clave;
-
-  // Update status
-  document.getElementById('login-status').textContent = 'Enviando credenciales...';
-
-  // Auto-submit after 1 second
-  loginTimeout = setTimeout(() => {
-    document.getElementById('login-status').textContent = 'Redirigiendo...';
-    document.getElementById('login-form').submit();
+  setTimeout(() => {
+    showMainScreen();
   }, 1000);
 }
 
-function cancelLogin() {
-  if (loginTimeout) {
-    clearTimeout(loginTimeout);
-  }
-  showSetupScreen();
+function loginToClub() {
+  // Fill form with saved credentials
+  document.getElementById('form-usuario').value = credentials.usuario;
+  document.getElementById('form-clave').value = credentials.clave;
+
+  // Submit form (this will redirect to club's login page)
+  document.getElementById('login-form').submit();
 }
 
-function clearCredentials() {
-  if (confirm('¿Estás seguro de que quieres borrar tus credenciales guardadas?')) {
-    localStorage.removeItem('gym-credentials');
-    credentials = null;
-    if (loginTimeout) {
-      clearTimeout(loginTimeout);
-    }
-    location.reload();
+function showChangeCredentials() {
+  if (confirm('¿Quieres cambiar tus credenciales guardadas?')) {
+    // Clear inputs
+    document.getElementById('setup-usuario').value = '';
+    document.getElementById('setup-clave').value = '';
+    showSetupScreen();
   }
 }
 
 function showStatus(screen, message, type) {
-  const statusId = screen === 'setup' ? 'setup-status' : 'autologin-status';
-  const statusEl = document.getElementById(statusId);
+  const statusId = screen === 'setup' ? 'setup-status' : 'main-status';
+  let statusEl = document.getElementById(statusId);
+
+  if (!statusEl) {
+    statusEl = document.createElement('div');
+    statusEl.id = statusId;
+    document.getElementById(screen + '-screen').appendChild(statusEl);
+  }
+
   statusEl.className = `status-message status-${type}`;
   statusEl.textContent = message;
   statusEl.style.display = 'block';
@@ -340,14 +430,20 @@ function showStatus(screen, message, type) {
 
 // Handle iOS Safari back button
 window.addEventListener('pageshow', function(event) {
-  if (event.persisted || performance.getEntriesByType("navigation")[0].type === 'back_forward') {
-    // User came back, check if credentials exist
+  if (event.persisted || (performance.getEntriesByType("navigation")[0] && performance.getEntriesByType("navigation")[0].type === 'back_forward')) {
+    // User came back from club page
     const saved = localStorage.getItem('gym-credentials');
     if (saved) {
       credentials = JSON.parse(saved);
-      autoLogin();
+      showMainScreen();
     }
   }
+});
+
+// Prevent accidental back navigation
+let isNavigatingAway = false;
+document.getElementById('login-form').addEventListener('submit', function() {
+  isNavigatingAway = true;
 });
 </script>
 
