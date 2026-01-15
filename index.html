@@ -15,34 +15,41 @@ body {
   background: linear-gradient(135deg, #0f0f0f 0%, #000 100%);
   color: #fff;
   min-height: 100vh;
-  display: flex;
+  overflow: hidden;
+}
+
+/* Container for all screens */
+.screen {
+  min-height: 100vh;
+  display: none;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 20px;
 }
 
-/* ========== Setup Screen (Primera vez) ========== */
-#setup-screen {
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-  display: none;
+.screen.active {
+  display: flex;
 }
 
+/* ========== Setup Screen ========== */
 #setup-screen h1 {
   font-size: 36px;
   margin-bottom: 8px;
   font-weight: 700;
+  text-align: center;
 }
 
 #setup-screen .subtitle {
   color: #888;
   margin-bottom: 50px;
   font-size: 15px;
+  text-align: center;
 }
 
 .input-group {
+  width: 100%;
+  max-width: 400px;
   margin-bottom: 20px;
   text-align: left;
 }
@@ -72,12 +79,11 @@ body {
   background: #222;
 }
 
-/* ========== Main Screen (Usuario ya registrado) ========== */
+/* ========== Main Screen ========== */
 #main-screen {
   width: 100%;
   max-width: 400px;
   text-align: center;
-  display: none;
 }
 
 .app-header {
@@ -145,9 +151,10 @@ body {
   50% { opacity: 0.4; }
 }
 
-/* Main Action Button */
+/* Buttons */
 .btn-main {
   width: 100%;
+  max-width: 400px;
   padding: 20px;
   background: linear-gradient(135deg, #34c759 0%, #2fb350 100%);
   color: #fff;
@@ -168,9 +175,9 @@ body {
   box-shadow: 0 4px 12px rgba(52, 199, 89, 0.2);
 }
 
-/* Secondary Buttons */
 .btn-secondary {
   width: 100%;
+  max-width: 400px;
   padding: 14px;
   background: #1a1a1a;
   color: #888;
@@ -188,8 +195,121 @@ body {
   border-color: #444;
 }
 
+/* ========== QR Screen ========== */
+#qr-screen {
+  padding: 0;
+  background: #000;
+}
+
+.qr-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.qr-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.qr-header .btn-back {
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.qr-header .btn-back:active {
+  background: rgba(255,255,255,0.3);
+}
+
+.qr-header .status-indicator {
+  background: rgba(52, 199, 89, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(52, 199, 89, 0.4);
+  color: #34c759;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qr-header .status-indicator .pulse-dot {
+  width: 6px;
+  height: 6px;
+  background: #34c759;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+#club-iframe {
+  width: 100%;
+  flex: 1;
+  border: none;
+  background: #000;
+}
+
+/* Loading State */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.95);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+.loading-overlay.active {
+  display: flex;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #333;
+  border-top: 4px solid #34c759;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: #888;
+  font-size: 14px;
+}
+
 /* Info Box */
 .info-box {
+  width: 100%;
+  max-width: 400px;
   background: rgba(0, 122, 255, 0.1);
   border: 1px solid rgba(0, 122, 255, 0.3);
   border-radius: 12px;
@@ -203,9 +323,6 @@ body {
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .info-box .content {
@@ -214,22 +331,10 @@ body {
   line-height: 1.5;
 }
 
-.info-box ol {
-  margin-left: 18px;
-  margin-top: 8px;
-}
-
-.info-box li {
-  margin-bottom: 4px;
-}
-
-/* Hidden form for login */
-#login-form {
-  display: none;
-}
-
 /* Status Messages */
 .status-message {
+  width: 100%;
+  max-width: 400px;
   margin-top: 20px;
   padding: 14px;
   border-radius: 10px;
@@ -260,7 +365,6 @@ body {
   color: #34c759;
 }
 
-/* Footer */
 .footer {
   margin-top: 40px;
   color: #444;
@@ -271,8 +375,14 @@ body {
 </head>
 <body>
 
+<!-- Loading Overlay -->
+<div id="loading" class="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Conectando al club...</div>
+</div>
+
 <!-- Setup Screen (Primera vez) -->
-<div id="setup-screen">
+<div id="setup-screen" class="screen">
   <h1>🏋️ Gym QR</h1>
   <p class="subtitle">Acceso rápido al club</p>
 
@@ -298,8 +408,8 @@ body {
   </div>
 </div>
 
-<!-- Main Screen (Usuario registrado) -->
-<div id="main-screen">
+<!-- Main Screen (Pantalla principal) -->
+<div id="main-screen" class="screen">
   <div class="app-header">
     <h1>🏋️</h1>
     <p class="tagline">Club Atlético</p>
@@ -314,7 +424,7 @@ body {
     </div>
   </div>
 
-  <button class="btn-main" onclick="loginToClub()">
+  <button class="btn-main" onclick="enterClub()">
     🚀 Entrar al Club
   </button>
 
@@ -322,52 +432,61 @@ body {
     Cambiar Credenciales
   </button>
 
-  <div class="info-box">
-    <div class="title">💡 Tip: Guardar QR como wallpaper</div>
-    <div class="content">
-      Después de entrar al club:
-      <ol>
-        <li>Toca y mantén presionado el QR</li>
-        <li>Selecciona "Guardar imagen"</li>
-        <li>Usa la imagen como fondo de pantalla/lockscreen</li>
-      </ol>
-    </div>
-  </div>
-
   <div class="footer">
     Club Atlético San Miguel
   </div>
 </div>
 
+<!-- QR Screen (Muestra el panel del club) -->
+<div id="qr-screen" class="screen">
+  <div class="qr-container">
+    <div class="qr-header">
+      <button class="btn-back" onclick="goBack()">← Volver</button>
+      <div class="status-indicator">
+        <span class="pulse-dot"></span>
+        Sesión activa
+      </div>
+    </div>
+    <iframe id="club-iframe" src="about:blank"></iframe>
+  </div>
+</div>
+
 <!-- Hidden login form -->
-<form id="login-form" action="https://socios.clubatleticosanmiguel.com/" method="POST" target="_self">
+<form id="login-form" action="https://socios.clubatleticosanmiguel.com/" method="POST" target="club-iframe" style="display:none">
   <input type="number" name="usuario" id="form-usuario">
   <input type="password" name="clave" id="form-clave">
 </form>
 
 <script>
 let credentials = null;
+let currentScreen = null;
 
 // Check for saved credentials on load
 window.onload = function() {
   const saved = localStorage.getItem('gym-credentials');
   if (saved) {
     credentials = JSON.parse(saved);
-    showMainScreen();
+    showScreen('main');
   } else {
-    showSetupScreen();
+    showScreen('setup');
   }
 };
 
-function showSetupScreen() {
-  document.getElementById('setup-screen').style.display = 'block';
-  document.getElementById('main-screen').style.display = 'none';
-}
+function showScreen(screenName) {
+  // Hide all screens
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
 
-function showMainScreen() {
-  document.getElementById('setup-screen').style.display = 'none';
-  document.getElementById('main-screen').style.display = 'block';
-  document.getElementById('display-usuario').textContent = credentials.usuario;
+  // Show selected screen
+  const screen = document.getElementById(screenName + '-screen');
+  if (screen) {
+    screen.classList.add('active');
+    currentScreen = screenName;
+  }
+
+  // Update display if on main screen
+  if (screenName === 'main' && credentials) {
+    document.getElementById('display-usuario').textContent = credentials.usuario;
+  }
 }
 
 function saveCredentials() {
@@ -379,7 +498,6 @@ function saveCredentials() {
     return;
   }
 
-  // Validate usuario is a number
   if (isNaN(usuario)) {
     showStatus('setup', 'El número de socio debe ser numérico', 'error');
     return;
@@ -391,25 +509,41 @@ function saveCredentials() {
   showStatus('setup', '✓ Credenciales guardadas correctamente', 'success');
 
   setTimeout(() => {
-    showMainScreen();
+    showScreen('main');
   }, 1000);
 }
 
-function loginToClub() {
-  // Fill form with saved credentials
+function enterClub() {
+  // Show QR screen first
+  showScreen('qr');
+
+  // Show loading
+  document.getElementById('loading').classList.add('active');
+
+  // Fill form
   document.getElementById('form-usuario').value = credentials.usuario;
   document.getElementById('form-clave').value = credentials.clave;
 
-  // Submit form (this will redirect to club's login page)
+  // Submit form - iframe will receive the login response
   document.getElementById('login-form').submit();
+
+  // Hide loading after delay (iframe will load in background)
+  setTimeout(() => {
+    document.getElementById('loading').classList.remove('active');
+  }, 2000);
+}
+
+function goBack() {
+  // Clear iframe to save resources
+  document.getElementById('club-iframe').src = 'about:blank';
+  showScreen('main');
 }
 
 function showChangeCredentials() {
   if (confirm('¿Quieres cambiar tus credenciales guardadas?')) {
-    // Clear inputs
     document.getElementById('setup-usuario').value = '';
     document.getElementById('setup-clave').value = '';
-    showSetupScreen();
+    showScreen('setup');
   }
 }
 
@@ -420,7 +554,8 @@ function showStatus(screen, message, type) {
   if (!statusEl) {
     statusEl = document.createElement('div');
     statusEl.id = statusId;
-    document.getElementById(screen + '-screen').appendChild(statusEl);
+    const screenEl = document.getElementById(screen + '-screen');
+    screenEl.appendChild(statusEl);
   }
 
   statusEl.className = `status-message status-${type}`;
@@ -431,19 +566,17 @@ function showStatus(screen, message, type) {
 // Handle iOS Safari back button
 window.addEventListener('pageshow', function(event) {
   if (event.persisted || (performance.getEntriesByType("navigation")[0] && performance.getEntriesByType("navigation")[0].type === 'back_forward')) {
-    // User came back from club page
     const saved = localStorage.getItem('gym-credentials');
     if (saved) {
       credentials = JSON.parse(saved);
-      showMainScreen();
+      if (currentScreen === 'qr') {
+        // Refresh panel if coming back
+        document.getElementById('club-iframe').src = 'https://socios.clubatleticosanmiguel.com/panel.php';
+      } else {
+        showScreen('main');
+      }
     }
   }
-});
-
-// Prevent accidental back navigation
-let isNavigatingAway = false;
-document.getElementById('login-form').addEventListener('submit', function() {
-  isNavigatingAway = true;
 });
 </script>
 
