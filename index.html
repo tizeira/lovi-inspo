@@ -195,21 +195,24 @@ body {
   border-color: #444;
 }
 
-/* ========== QR Screen ========== */
-#qr-screen {
+/* ========== QR View Screen (NUEVO) ========== */
+#qr-view-screen {
   padding: 0;
   background: #000;
 }
 
-.qr-container {
+.qr-view-container {
   position: relative;
   width: 100%;
   height: 100vh;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #000;
 }
 
-.qr-header {
+.qr-view-header {
   position: absolute;
   top: 0;
   left: 0;
@@ -222,7 +225,7 @@ body {
   align-items: center;
 }
 
-.qr-header .btn-back {
+.btn-back {
   background: rgba(255,255,255,0.2);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,0.3);
@@ -234,11 +237,11 @@ body {
   cursor: pointer;
 }
 
-.qr-header .btn-back:active {
+.btn-back:active {
   background: rgba(255,255,255,0.3);
 }
 
-.qr-header .status-indicator {
+.status-indicator {
   background: rgba(52, 199, 89, 0.2);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(52, 199, 89, 0.4);
@@ -252,7 +255,7 @@ body {
   gap: 6px;
 }
 
-.qr-header .status-indicator .pulse-dot {
+.pulse-dot {
   width: 6px;
   height: 6px;
   background: #34c759;
@@ -260,11 +263,52 @@ body {
   animation: pulse 1.5s infinite;
 }
 
-#club-iframe {
+/* QR Image Display */
+#qr-image-display {
   width: 100%;
-  flex: 1;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 20px 20px;
+}
+
+#qr-image {
+  max-width: 90%;
+  max-height: 90%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(52, 199, 89, 0.3);
+}
+
+/* Error/Fallback message */
+.error-message {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.error-message h3 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  color: #ff3b30;
+}
+
+.error-message p {
+  color: #888;
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+/* Hidden iframe for login */
+#hidden-iframe {
+  position: absolute;
+  width: 0;
+  height: 0;
   border: none;
-  background: #000;
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Loading State */
@@ -378,7 +422,7 @@ body {
 <!-- Loading Overlay -->
 <div id="loading" class="loading-overlay">
   <div class="spinner"></div>
-  <div class="loading-text">Conectando al club...</div>
+  <div class="loading-text" id="loading-text">Conectando al club...</div>
 </div>
 
 <!-- Setup Screen (Primera vez) -->
@@ -437,22 +481,36 @@ body {
   </div>
 </div>
 
-<!-- QR Screen (Muestra el panel del club) -->
-<div id="qr-screen" class="screen">
-  <div class="qr-container">
-    <div class="qr-header">
+<!-- QR View Screen (Muestra QR extraído) -->
+<div id="qr-view-screen" class="screen">
+  <div class="qr-view-container">
+    <div class="qr-view-header">
       <button class="btn-back" onclick="goBack()">← Volver</button>
       <div class="status-indicator">
         <span class="pulse-dot"></span>
-        Sesión activa
+        QR Activo
       </div>
     </div>
-    <iframe id="club-iframe" src="about:blank"></iframe>
+
+    <div id="qr-image-display">
+      <img id="qr-image" src="" alt="QR del Club" style="display:none;">
+    </div>
+
+    <!-- Error/Fallback message -->
+    <div id="qr-error" class="error-message" style="display:none;">
+      <h3>⚠️ No se pudo extraer el QR</h3>
+      <p>El sitio del club bloqueó el acceso automático. Usa el botón de abajo para abrir la página completa.</p>
+      <button class="btn-main" onclick="openClubDirect()">Abrir Panel del Club</button>
+      <button class="btn-secondary" onclick="goBack()">Volver</button>
+    </div>
   </div>
 </div>
 
+<!-- Hidden iframe for login and QR extraction -->
+<iframe id="hidden-iframe" name="hidden-iframe"></iframe>
+
 <!-- Hidden login form -->
-<form id="login-form" action="https://socios.clubatleticosanmiguel.com/" method="POST" target="club-iframe" style="display:none">
+<form id="login-form" action="https://socios.clubatleticosanmiguel.com/" method="POST" target="hidden-iframe" style="display:none">
   <input type="number" name="usuario" id="form-usuario">
   <input type="password" name="clave" id="form-clave">
 </form>
@@ -460,6 +518,8 @@ body {
 <script>
 let credentials = null;
 let currentScreen = null;
+let qrExtractionAttempts = 0;
+let maxExtractionAttempts = 10;
 
 // Check for saved credentials on load
 window.onload = function() {
@@ -514,28 +574,124 @@ function saveCredentials() {
 }
 
 function enterClub() {
-  // Show QR screen first
-  showScreen('qr');
+  // Reset extraction attempts
+  qrExtractionAttempts = 0;
 
   // Show loading
   document.getElementById('loading').classList.add('active');
+  document.getElementById('loading-text').textContent = 'Iniciando sesión...';
 
   // Fill form
   document.getElementById('form-usuario').value = credentials.usuario;
   document.getElementById('form-clave').value = credentials.clave;
 
-  // Submit form - iframe will receive the login response
-  document.getElementById('login-form').submit();
+  // Setup iframe load listener
+  const iframe = document.getElementById('hidden-iframe');
 
-  // Hide loading after delay (iframe will load in background)
-  setTimeout(() => {
-    document.getElementById('loading').classList.remove('active');
-  }, 2000);
+  iframe.onload = function() {
+    console.log('Iframe loaded, attempting QR extraction...');
+    document.getElementById('loading-text').textContent = 'Extrayendo QR...';
+
+    // Try to extract QR after a delay
+    setTimeout(() => {
+      tryExtractQR();
+    }, 1500);
+  };
+
+  // Submit form
+  document.getElementById('login-form').submit();
+}
+
+function tryExtractQR() {
+  qrExtractionAttempts++;
+
+  try {
+    const iframe = document.getElementById('hidden-iframe');
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+    // Try to find the QR image
+    const qrImg = iframeDoc.querySelector('.qr.qr2') || iframeDoc.querySelector('img[src*="qr.php"]');
+
+    if (qrImg) {
+      console.log('QR found!', qrImg);
+
+      // Get the full URL of the QR image
+      let qrSrc = qrImg.src;
+
+      // If relative URL, make it absolute
+      if (!qrSrc.startsWith('http')) {
+        qrSrc = 'https://socios.clubatleticosanmiguel.com/' + qrSrc;
+      }
+
+      console.log('QR URL:', qrSrc);
+
+      // Display the QR
+      displayQR(qrSrc);
+
+    } else {
+      console.log('QR not found yet, attempt', qrExtractionAttempts);
+
+      // Retry if we haven't exceeded max attempts
+      if (qrExtractionAttempts < maxExtractionAttempts) {
+        setTimeout(tryExtractQR, 500);
+      } else {
+        console.log('Max attempts reached, showing fallback');
+        showQRFallback();
+      }
+    }
+
+  } catch (error) {
+    console.error('CORS error or access denied:', error);
+
+    // CORS blocked - show fallback
+    showQRFallback();
+  }
+}
+
+function displayQR(qrUrl) {
+  // Hide loading
+  document.getElementById('loading').classList.remove('active');
+
+  // Show QR view screen
+  showScreen('qr-view');
+
+  // Set QR image
+  const qrImage = document.getElementById('qr-image');
+  qrImage.src = qrUrl;
+  qrImage.style.display = 'block';
+
+  // Hide error message
+  document.getElementById('qr-error').style.display = 'none';
+  document.getElementById('qr-image-display').style.display = 'flex';
+}
+
+function showQRFallback() {
+  // Hide loading
+  document.getElementById('loading').classList.remove('active');
+
+  // Show QR view screen with error
+  showScreen('qr-view');
+
+  // Hide QR image
+  document.getElementById('qr-image-display').style.display = 'none';
+
+  // Show error message
+  document.getElementById('qr-error').style.display = 'block';
+}
+
+function openClubDirect() {
+  // Open club panel in same window
+  window.location.href = 'https://socios.clubatleticosanmiguel.com/panel.php';
 }
 
 function goBack() {
-  // Clear iframe to save resources
-  document.getElementById('club-iframe').src = 'about:blank';
+  // Clear iframe
+  const iframe = document.getElementById('hidden-iframe');
+  iframe.src = 'about:blank';
+
+  // Clear QR image
+  document.getElementById('qr-image').src = '';
+
   showScreen('main');
 }
 
@@ -569,12 +725,7 @@ window.addEventListener('pageshow', function(event) {
     const saved = localStorage.getItem('gym-credentials');
     if (saved) {
       credentials = JSON.parse(saved);
-      if (currentScreen === 'qr') {
-        // Refresh panel if coming back
-        document.getElementById('club-iframe').src = 'https://socios.clubatleticosanmiguel.com/panel.php';
-      } else {
-        showScreen('main');
-      }
+      showScreen('main');
     }
   }
 });
